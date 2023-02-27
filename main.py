@@ -52,7 +52,7 @@ def simple_iteration_method(g, x, eps):
 def main():
     print("Метод дихотомії: ", dih_method(funct, -1, 2, 0.0001))
     print("Метод релаксації: ", relaxation_method(funct, 1, 0.05, 0.0001))
-    print("Метод простої ітерації: ", simple_iteration_method(function_for_simple_itterarion, 100, 0.0000001))
+    print("Метод простої ітерації: ", simple_iteration_method(function_for_simple_itterarion, 100, 0.0001))
 
 if __name__ == "__main__":
     main()
