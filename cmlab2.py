@@ -1,19 +1,11 @@
 import numpy as np
+import chmlab2input as inpt
 #import matplotlib
 #matplotlib.use('TkAgg')
 
 from matplotlib import pyplot as plt
 
-#input data
-data = [
-    (8, 1, 45),
-    (18, 0, 120),
-    (26, 15, 210),
-    (13, 16, 270),
-    (0, 14, 320)
-]
-x_fact, y_fact = 15, 8
-x_squre, y_squre = 16, 9
+
 
 def prepare_system(data):
     A = np.array([[-np.tan(np.radians(row[2])), 1] for row in data])
@@ -39,7 +31,7 @@ def visualize_data(data, ship_coordinates):
         i = i + 1
 
     plt.plot(ship_coordinates[0], ship_coordinates[1], 'bo')
-    plt.plot(x_fact, y_fact, 'ro', markersize=8, label='теоретичне розташування')
+    plt.plot(inpt.x_fact, inpt.y_fact, 'ro', markersize=8, label='теоретичне розташування')
 
     plt.axhline(0, color='black', linewidth=0.5)
     plt.axvline(0, color='black', linewidth=0.5)
@@ -62,7 +54,7 @@ def visualize_data2(data, prev_index, ship_coordinates):
 
     plt.plot(ship_coordinates[0], ship_coordinates[1], 'bo')
 
-    plt.plot(x_fact, y_fact, 'ro', markersize=8, label='теоретичне розташування')
+    plt.plot(inpt.x_fact, inpt.y_fact, 'ro', markersize=8, label='теоретичне розташування')
 
     circle = plt.Circle((ship_coordinates[0], ship_coordinates[1]), 2, fill=False, color='b', linestyle='--')
     plt.gca().add_patch(circle)
@@ -89,9 +81,9 @@ def visualize_data3(data, prev_index, ship_coordinates):
     plt.plot(ship_coordinates[0], ship_coordinates[1], 'bo')
 
 
-    square_vertices = [(x_squre, y_squre), (x_squre + 2, y_squre),
-                       (x_squre + 2, y_squre + 2), (x_squre, y_squre + 2),
-                       (x_squre, y_squre)]
+    square_vertices = [(inpt.x_squre, inpt.y_squre), (inpt.x_squre + 2, inpt.y_squre),
+                       (inpt.x_squre + 2, inpt.y_squre + 2), (inpt.x_squre, inpt.y_squre + 2),
+                       (inpt.x_squre, inpt.y_squre)]
     xs, ys = zip(*square_vertices)
     plt.plot(xs, ys, 'b-')
 
@@ -119,14 +111,14 @@ def filter_data(data, terminal_angle):
     prev_index = []
     i = 0
     for xi, yi, ai in data:
-        if angle_difference(ai, angle_from_horizontal(xi, yi, x_fact, y_fact)) <= terminal_angle:
+        if angle_difference(ai, angle_from_horizontal(xi, yi, inpt.x_fact, inpt.y_fact)) <= terminal_angle:
             filtered_row = (xi, yi, ai)
             filtered_data.append(filtered_row)
             prev_index.append(i)
-            print("Датчик ", i, "відхиляється на кут ", angle_difference(ai, angle_from_horizontal(xi, yi, x_fact, y_fact)))
+            print("Датчик ", i, "відхиляється на кут ", angle_difference(ai, angle_from_horizontal(xi, yi, inpt.x_fact, inpt.y_fact)))
 
         else:
-            print("Датчик ", i, "відхиляється на кут ", angle_difference(ai, angle_from_horizontal(xi, yi, x_fact, y_fact)),
+            print("Датчик ", i, "відхиляється на кут ", angle_difference(ai, angle_from_horizontal(xi, yi, inpt.x_fact, inpt.y_fact)),
                   "це більше ", terminal_angle)
         i = i + 1
     return filtered_data, prev_index
@@ -180,28 +172,28 @@ def accuracy_evaluation(detectors, x, y):
 
     for x1, y1, angle in detectors:
         k = np.tan(np.radians(angle))
-        error = (y1 - k * x1 + k * x - y)**2
+        error = ((y1 - k * x1 + k * x - y)**2)**(1/2)
         total_error += error
 
     return total_error
 
 def main():
     #Завдання 1
-    A, b =  prepare_system(data)
+    A, b =  prepare_system(inpt.data)
 
     ship_coordinates = solve_system(A, b)
 
     print("Координати коробля: ", ship_coordinates)
-    print("Похибка: ", accuracy_evaluation(data, ship_coordinates[0], ship_coordinates[1]))
-    visualize_data(data, ship_coordinates)
+    print("Похибка: ", accuracy_evaluation(inpt.data, ship_coordinates[0], ship_coordinates[1]))
+    visualize_data(inpt.data, ship_coordinates)
 
     # Завдання 2
-    distance = np.sqrt((x_fact - ship_coordinates[0]) ** 2 + (y_fact - ship_coordinates[1]) ** 2)
-    print("Передані координати: ", x_fact, y_fact)
+    distance = np.sqrt((inpt.x_fact - ship_coordinates[0]) ** 2 + (inpt.y_fact - ship_coordinates[1]) ** 2)
+    print("Передані координати: ", inpt.x_fact, inpt.y_fact)
     print("Відстань до даних з датчиків: ", distance)
     terminal_angle = 10
     #print (np.degrees(np.arctan2((y_fact-data[0][1]),(x_fact-data[0][0]))))
-    filtered_data, prev_index = filter_data(data, terminal_angle)
+    filtered_data, prev_index = filter_data(inpt.data, terminal_angle)
 
     A2, b2 = prepare_system(filtered_data)
     print("Координати коробля після фільтрування датчиків: ", solve_system(A2,b2))
@@ -210,7 +202,7 @@ def main():
     print("Похибка: ", accuracy_evaluation(filtered_data, ship_coordinates2[0], ship_coordinates2[1]))
 
     # Завдання 3
-    filtered_data2, prev_index2 = filter_data_square(data , x_squre, y_squre)
+    filtered_data2, prev_index2 = filter_data_square(inpt.data , inpt.x_squre, inpt.y_squre)
     A3, b3 = prepare_system(filtered_data2)
     print("Координати коробля після фільтрування датчиків по квадрату: ", solve_system(A3, b3))
     ship_coordinates3 =  solve_system(A3, b3)
