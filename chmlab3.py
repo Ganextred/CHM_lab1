@@ -69,6 +69,10 @@ def main():
     plt.legend()
     plt.show()
 
+    print("X value", x_values_real[-1])
+    print('Real value', y_values_real[-1])
+    print('Euler Method', y_values1[-1])
+    print('Runge-Kutta 2nd Order', y_values2[-1])
 
 
 if __name__ == "__main__":
